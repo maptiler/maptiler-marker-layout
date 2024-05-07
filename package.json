@@ -1,0 +1,57 @@
+{
+  "name": "@maptiler/popup-manager",
+  "version": "1.0.0",
+  "description": "Popup manager for MapTiler SDK",
+  "module": "dist/maptiler-popup-manager.js",
+  "types": "dist/maptiler-popup-manager.d.ts",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/maptiler-popup-manager.js",
+      "types": "./dist/maptiler-popup-manager.d.ts"
+    }
+  },
+  "publishConfig": {
+    "access": "restricted",
+    "registry": "https://npm.pkg.github.com/maptiler"
+  },
+  "author": "MapTiler",
+  "keywords": [
+    "maptiler",
+    "plugin",
+    "data"
+  ],
+  "scripts": {
+    "format": "prettier -c \"src/**/*.{js,ts,tsx}\"",
+    "lint": "eslint \"src/**/*.{js,ts}\"",
+    "format:fix": "prettier --write \"src/**/*.{js,ts,tsx}\"",
+    "lint:fix": "eslint --fix \"src/**/*.{js,ts}\"",
+    "make": "npm run format:fix && npm run lint:fix && npm run build",
+    "dev": "vite -c vite.config-es.ts",
+    "build": "npm run build-es; npm run build-umd",
+    "build-dev": "NODE_ENV=development npm run build-es; NODE_ENV=development npm run build-umd",
+    "build-umd": "tsc && vite build -c vite.config-umd.ts",
+    "build-es": "tsc && vite build -c vite.config-es.ts",
+    "build-umd-dev-watch": "tsc && NODE_ENV=development vite build -w -c vite.config-umd.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/maptiler/maptiler-popup-manager-js.git"
+  },
+  "license": "",
+  "devDependencies": {
+    "@types/node": "^20.11.5",
+    "@typescript-eslint/eslint-plugin": "^6.19.0",
+    "@typescript-eslint/parser": "^6.19.0",
+    "eslint": "^8.56.0",
+    "eslint-import-resolver-typescript": "^3.6.1",
+    "eslint-plugin-import": "^2.29.1",
+    "prettier": "^3.2.4",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.12",
+    "vite-plugin-dts": "^3.7.1"
+  },
+  "dependencies": {
+    "@maptiler/sdk": "^1.2.1"
+  }
+}

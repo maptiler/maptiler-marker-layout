@@ -1,0 +1,8 @@
+src/
+docs
+tests
+vite*
+*.tgz
+.github
+.eslintrc.cjs 
+demos

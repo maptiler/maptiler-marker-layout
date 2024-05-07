@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>MapTiler Wind</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+
+  <!-- Import MapTiler SDK -->
+  <script src="https://cdn.maptiler.com/maptiler-sdk-js/v1.2.1/maptiler-sdk.umd.min.js"></script>
+  <link href="https://cdn.maptiler.com/maptiler-sdk-js/v1.2.1/maptiler-sdk.css" rel="stylesheet" />
+
+  <!-- Import Popup Manager -->
+  <script src="../build/maptiler-popup-manager.umd.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: sans-serif;
+    }
+
+    ul {
+      list-style-type: none;
+      padding: 0;
+      margin: 5px;
+    }
+
+    #map {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 100%;
+    }
+
+
+    .popup {
+      position: absolute;
+      pointer-events: none;
+      color: #000;
+      line-height: 12px;
+      box-shadow: #00000040 0px 2px 10px;
+    }
+
+    .popupPointy {
+      width: 12px;
+      height: 12px;
+      background-color: #e6e6e6;
+      position: absolute;
+      transform: rotate(45deg) translate(-70%);
+      bottom: -12px;
+      left: 0;
+      right: -12px;
+      margin: auto;
+      box-shadow: #00000040 0px 2px 10px;
+    }
+
+    .popupBody {
+      position: absolute;
+      background: #e6e6e6;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      border-radius: 2px;
+      /* padding: 3px;  */
+    }
+
+    .popupTop {
+      border-top-left-radius: inherit;
+      border-top-right-radius: inherit;
+      width: 100%;
+      height: 20px;
+      line-height: 20px;
+      text-align: center;
+      background: #4d4d4d;
+      color: white;
+      font-size: 15px;
+      font-weight: 400;
+    }
+
+    .popupBottom {
+      border-radius: inherit;
+      width: 100%;
+      height: calc(100% - 20px);
+      display: flex;
+      
+    }
+
+
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .fade-in-animation {
+      animation: fadeIn 0.5s ease forwards;
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <div id="map"></div>
+
+  <script>
+   
+    const appContainer = document.getElementById('map');
+
+    maptilersdk.config.apiKey = 'dur4cHJc9CiBxzv0S6Kh';
+
+    const map = new maptilersdk.Map({
+      container: appContainer,
+      hash: true,
+      geolocate: true,
+    });
+
+    // Creating the div that will contain all the popups
+    const popupContainer = document.createElement("div");
+    appContainer.appendChild(popupContainer);
+
+    (async () => {
+      await map.onReadyAsync();
+
+      const popupManager = new maptilerpopupmanager.PopupManager(map, {
+        layers: ["City labels", "Place labels", "Town labels"],
+        popupSize: [140, 70],
+        popupAnchor: "top",
+        offset: [0, -8], // so that the tip of the popup bottom pin lands on the city dot
+        sortingProperty: "rank",
+        filter: ((feature) => {
+          return ["city", "village", "town"].includes(feature.properties.class)
+        })
+      });
+
+
+      // This object contains the popup DIV so that they can be updated rather than fully recreated every time
+      const popupLogicContainer = {};
+
+      // This function will be used as the callback for some map events
+      const updatePopups = () => {
+        const popupStatus = popupManager.update();
+
+        if (!popupStatus) return;
+
+        // Remove the div that corresponds to removed popups
+        popupStatus.removed.forEach((abstractPopup) => {
+          const popupDiv = popupLogicContainer[abstractPopup.id];
+          delete popupLogicContainer[abstractPopup.id];
+          popupContainer.removeChild(popupDiv);
+        });
+
+        // Update the div that corresponds to updated popups
+        popupStatus.updated.forEach((abstractPopup) => {
+          const popupDiv = popupLogicContainer[abstractPopup.id];
+          updatePopupDiv(abstractPopup, popupDiv);
+        });
+
+        // Create the div that corresponds to the new popups
+        popupStatus.new.forEach((abstractPopup) => {
+          const popupDiv = makePopup(abstractPopup);
+          popupLogicContainer[abstractPopup.id] = popupDiv;
+          popupContainer.appendChild(popupDiv);
+        });
+      }
+
+      // The "idle" event is triggered every second because of the particle layer being refreshed,
+      // even though their is no new data loaded, so this approach proved to be the best for this scenario
+      map.on("move", updatePopups);
+
+      map.on("moveend", () => {
+        map.once("idle", updatePopups);
+      })
+
+      updatePopups();
+    })()
+
+
+
+
+
+  function makePopup(
+    abstractPopup, 
+  ) {
+
+    const popup = document.createElement("div");
+    popup.classList.add("popup");
+    popup.classList.add('fade-in-animation');
+    popup.style.setProperty("width", `${abstractPopup.size[0]}px`);
+    popup.style.setProperty("height", `${abstractPopup.size[1]}px`);
+    popup.style.setProperty("transform", `translate(${abstractPopup.position[0]}px, ${abstractPopup.position[1]}px)`);
+
+    const feature = abstractPopup.features[0];
+
+    popup.innerHTML = `
+      <div class="popupPointy"></div>
+      <div class="popupBody">
+        
+        <div class="popupTop">
+          ${feature.properties["name:en"] || feature.properties["name"]}
+        </div>
+        
+        <div class="popupBottom">
+          <ul>
+            <li><b>Class:</b> ${feature.properties.class}</li>
+            <li><b>Capital:</b> ${feature.properties.capital}</li>
+            <li><b>Rank:</b> ${feature.properties.rank}</li>
+          </ul>
+
+
+        </div>
+      </div>
+    `
+
+    return popup;
+  }
+
+
+  function updatePopupDiv(abstractPopup, popup) {
+    popup.style.setProperty("width", `${abstractPopup.size[0]}px`);
+    popup.style.setProperty("height", `${abstractPopup.size[1]}px`);
+    popup.style.setProperty("transform", `translate(${abstractPopup.position[0]}px, ${abstractPopup.position[1]}px)`);
+  }
+
+
+  </script>
+</body>
+</html>
