@@ -52,6 +52,6 @@
     "vite-plugin-dts": "^3.7.1"
   },
   "dependencies": {
-    "@maptiler/sdk": "^1.2.1"
+    "@maptiler/sdk": "^2.0.3"
   }
 }

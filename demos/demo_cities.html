@@ -10,7 +10,7 @@
   <link href="https://cdn.maptiler.com/maptiler-sdk-js/v2.0.3/maptiler-sdk.css" rel="stylesheet" />
 
   <!-- Import MapTiler Maker Layout -->
-  <script src="../build/markerlayout.umd.js"></script>
+  <script src="../build/maptiler-marker-layout.umd.js"></script>
 
   <style>
     body {
@@ -178,8 +178,6 @@
   function makeMarker(
     abstractMarker, 
   ) {
-
-    console.log("abstractMarker", abstractMarker);
 
     const marker = document.createElement("div");
     marker.classList.add("marker");
