@@ -40,7 +40,7 @@
       box-shadow: #00000040 0px 2px 10px;
     }
 
-    .parkerPointy {
+    .markerPointy {
       width: 12px;
       height: 12px;
       background-color: #e6e6e6;
@@ -53,7 +53,7 @@
       box-shadow: #00000040 0px 2px 10px;
     }
 
-    .parkerBody {
+    .markerBody {
       position: absolute;
       background: #e6e6e6;
       width: 100%;
@@ -63,7 +63,7 @@
       /* padding: 3px;  */
     }
 
-    .parkerTop {
+    .markerTop {
       border-top-left-radius: inherit;
       border-top-right-radius: inherit;
       width: 100%;
@@ -76,7 +76,7 @@
       font-weight: 400;
     }
 
-    .parkerBottom {
+    .markerBottom {
       border-radius: inherit;
       width: 100%;
       height: calc(100% - 20px);
@@ -111,14 +111,14 @@
       geolocate: true,
     });
 
-    // Creating the div that will contain all the parkers
-    const parkerContainer = document.createElement("div");
-    appContainer.appendChild(parkerContainer);
+    // Creating the div that will contain all the markers
+    const markerContainer = document.createElement("div");
+    appContainer.appendChild(markerContainer);
 
     (async () => {
       await map.onReadyAsync();
 
-      const parkerManager = new maptilermarkerlayout.MarkerLayout(map, {
+      const markerManager = new maptilermarkerlayout.MarkerLayout(map, {
         layers: ["Capital city labels", "City labels", "Place labels", "Town labels"],
         markerSize: [140, 80],
         markerAnchor: "top",
@@ -137,32 +137,32 @@
 
 
       // This object contains the marker DIV so that they can be updated rather than fully recreated every time
-      const parkerLogicContainer = {};
+      const markerLogicContainer = {};
 
       // This function will be used as the callback for some map events
       const updateMarkers = () => {
-        const parkerStatus = parkerManager.update();
+        const markerStatus = markerManager.update();
 
-        if (!parkerStatus) return;
+        if (!markerStatus) return;
 
-        // Remove the div that corresponds to removed parkers
-        parkerStatus.removed.forEach((abstractMarker) => {
-          const parkerDiv = parkerLogicContainer[abstractMarker.id];
-          delete parkerLogicContainer[abstractMarker.id];
-          parkerContainer.removeChild(parkerDiv);
+        // Remove the div that corresponds to removed markers
+        markerStatus.removed.forEach((abstractMarker) => {
+          const markerDiv = markerLogicContainer[abstractMarker.id];
+          delete markerLogicContainer[abstractMarker.id];
+          markerContainer.removeChild(markerDiv);
         });
 
-        // Update the div that corresponds to updated parkers
-        parkerStatus.updated.forEach((abstractMarker) => {
-          const parkerDiv = parkerLogicContainer[abstractMarker.id];
-          updateMarkerDiv(abstractMarker, parkerDiv);
+        // Update the div that corresponds to updated markers
+        markerStatus.updated.forEach((abstractMarker) => {
+          const markerDiv = markerLogicContainer[abstractMarker.id];
+          updateMarkerDiv(abstractMarker, markerDiv);
         });
 
-        // Create the div that corresponds to the new parkers
-        parkerStatus.new.forEach((abstractMarker) => {
-          const parkerDiv = makeMarker(abstractMarker);
-          parkerLogicContainer[abstractMarker.id] = parkerDiv;
-          parkerContainer.appendChild(parkerDiv);
+        // Create the div that corresponds to the new markers
+        markerStatus.new.forEach((abstractMarker) => {
+          const markerDiv = makeMarker(abstractMarker);
+          markerLogicContainer[abstractMarker.id] = markerDiv;
+          markerContainer.appendChild(markerDiv);
         });
       }
 
@@ -175,10 +175,6 @@
       })
 
       updateMarkers();
-
-      map.on("click", (e) => {
-        console.log(e);
-      });
     })()
 
 
@@ -199,14 +195,14 @@
     const feature = abstractMarker.features[0];
 
     marker.innerHTML = `
-      <div class="parkerPointy"></div>
-      <div class="parkerBody">
+      <div class="markerPointy"></div>
+      <div class="markerBody">
         
-        <div class="parkerTop">
+        <div class="markerTop">
           ${feature.properties["name:en"] || feature.properties["name"]}
         </div>
         
-        <div class="parkerBottom">
+        <div class="markerBottom">
           <ul>
             <li><b>Class:</b> ${feature.properties.class}</li>
             <li><b>Capital:</b> ${feature.properties.capital}</li>

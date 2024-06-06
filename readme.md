@@ -211,7 +211,7 @@ type MarkerStatus = {
 };
 ```
 
-### Updating
+### Methods
 As we interact with the map (pan, zoom, rotation, etc.) we need to know which markers are now visible, disapeared outside the viewport or are still visible but at a different (screen space) location.
 
 To compute this, a `MarkerLayout` instance has two methods:
@@ -222,6 +222,8 @@ In case many vector features are found in the specified `layers` with the provid
 - `.softUpdateAbstractMarker(am)` only update a single `AbstractMarker` with a new screenspace position.  
 This is convenient to use when there are hundreds of vector features found but we only want to update the position, say, of the ones retrieved with the previous full `.update()` call. In this performance-wise conservative mode, one would typically bind `.update()` to the `Map` event `"idle"` and bind `.softUpdateAbstractMarker(am)` to the `Map` event `"move"`.
 
+We can also reset the internal `MarkerStatus` if we need to restart from a blank slate without creating a new `MarkerLayout` instance:
+- `.reset()`
 
 ## Examples
 You can find two examples in this repo:

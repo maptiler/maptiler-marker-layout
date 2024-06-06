@@ -40,7 +40,7 @@
       box-shadow: #00000040 0px 2px 10px;
     }
 
-    .parkerPointy {
+    .markerPointy {
       width: 12px;
       height: 12px;
       background-color: #e6e6e6;
@@ -53,7 +53,7 @@
       box-shadow: #00000040 0px 2px 10px;
     }
 
-    .parkerBody {
+    .markerBody {
       position: absolute;
       background: #e6e6e6;
       width: 100%;
@@ -63,7 +63,7 @@
       /* padding: 3px;  */
     }
 
-    .parkerTop {
+    .markerTop {
       border-top-left-radius: inherit;
       border-top-right-radius: inherit;
       width: 100%;
@@ -72,15 +72,17 @@
       text-align: center;
       background: #4d4d4d;
       color: white;
-      font-size: 15px;
+      font-size: 12px;
       font-weight: 400;
     }
 
-    .parkerBottom {
+    .markerBottom {
       border-radius: inherit;
       width: 100%;
       height: calc(100% - 20px);
-      display: flex;
+      line-height: 20px;
+      font-size: 12;
+      text-align: center;
     }
 
     @keyframes fadeIn {
@@ -100,9 +102,7 @@
   <div id="map"></div>
 
   <script>
-   
     const appContainer = document.getElementById('map');
-
     maptilersdk.config.apiKey = 'dur4cHJc9CiBxzv0S6Kh';
 
     const map = new maptilersdk.Map({
@@ -111,84 +111,89 @@
       geolocate: true,
     });
 
-    // Creating the div that will contain all the parkers
-    const parkerContainer = document.createElement("div");
-    appContainer.appendChild(parkerContainer);
+    // Creating the div that will contain all the markers
+    const markerContainer = document.createElement("div");
+    appContainer.appendChild(markerContainer);
 
     (async () => {
       await map.onReadyAsync();
 
-      const parkerManager = new maptilermarkerlayout.MarkerLayout(map, {
+      const markerManager = new maptilermarkerlayout.MarkerLayout(map, {
         layers: ["Capital city labels", "City labels", "Place labels", "Town labels"],
-        markerSize: [140, 80],
+        markerSize: [140, 40],
         markerAnchor: "top",
         offset: [0, -8], // so that the tip of the marker bottom pin lands on the city dot
         sortingProperty: "rank",
 
-        // With `sortingProperty` option as a function, the followign is equivalent to the above
-        // sortingProperty: (feature) => {
-        //   return feature.properties.rank;
-        // },
-
-        filter: ((feature) => {
-          return ["city", "village", "town"].includes(feature.properties.class)
-        })
+        // no filtering so that we get as many features as possible
       });
 
 
       // This object contains the marker DIV so that they can be updated rather than fully recreated every time
-      const parkerLogicContainer = {};
+      const markerLogicContainer = {};
+
+      let markerStatus = null;
 
       // This function will be used as the callback for some map events
       const updateMarkers = () => {
-        const parkerStatus = parkerManager.update();
+        markerStatus = markerManager.update();
 
-        if (!parkerStatus) return;
+        if (!markerStatus) return;
 
-        // Remove the div that corresponds to removed parkers
-        parkerStatus.removed.forEach((abstractMarker) => {
-          const parkerDiv = parkerLogicContainer[abstractMarker.id];
-          delete parkerLogicContainer[abstractMarker.id];
-          parkerContainer.removeChild(parkerDiv);
+        // Remove the div that corresponds to removed markers
+        markerStatus.removed.forEach((abstractMarker) => {
+          const markerDiv = markerLogicContainer[abstractMarker.id];
+          delete markerLogicContainer[abstractMarker.id];
+          markerContainer.removeChild(markerDiv);
         });
 
-        // Update the div that corresponds to updated parkers
-        parkerStatus.updated.forEach((abstractMarker) => {
-          const parkerDiv = parkerLogicContainer[abstractMarker.id];
-          updateMarkerDiv(abstractMarker, parkerDiv);
+        // Update the div that corresponds to updated markers
+        markerStatus.updated.forEach((abstractMarker) => {
+          const markerDiv = markerLogicContainer[abstractMarker.id];
+          updateMarkerDiv(abstractMarker, markerDiv);
         });
 
-        // Create the div that corresponds to the new parkers
-        parkerStatus.new.forEach((abstractMarker) => {
-          const parkerDiv = makeMarker(abstractMarker);
-          parkerLogicContainer[abstractMarker.id] = parkerDiv;
-          parkerContainer.appendChild(parkerDiv);
+        // Create the div that corresponds to the new markers
+        markerStatus.new.forEach((abstractMarker) => {
+          const markerDiv = makeMarker(abstractMarker);
+          markerLogicContainer[abstractMarker.id] = markerDiv;
+          markerContainer.appendChild(markerDiv);
         });
       }
 
-      // The "idle" event is triggered every second because of the particle layer being refreshed,
-      // even though their is no new data loaded, so this approach proved to be the best for this scenario
-      map.on("move", updateMarkers);
+      const softUpdateMarkers = () => {
+        // A previous run of .update() yieding no result or not being ran at all
+        // would stop the soft update
+        if (!markerStatus) return;
 
-      map.on("moveend", () => {
-        map.once("idle", updateMarkers);
-      })
+        markerStatus.updated.forEach((abstractMarker) => {
+          markerManager.softUpdateAbstractMarker(abstractMarker);
+          const markerDiv = markerLogicContainer[abstractMarker.id];
+          updateMarkerDiv(abstractMarker, markerDiv);
+        })
 
+        markerStatus.new.forEach((abstractMarker) => {
+          markerManager.softUpdateAbstractMarker(abstractMarker);
+          const markerDiv = markerLogicContainer[abstractMarker.id];
+          updateMarkerDiv(abstractMarker, markerDiv);
+        })
+      }
+
+      // While moving the map, this event is triggered many times per seconds
+      // so we only perform a soft update (that could be debounced)
+      map.on("move", softUpdateMarkers);
+
+      // When done moving, we perform a full update
+      map.on("moveend", updateMarkers)
+
+      // Full update at init
       updateMarkers();
-
-      map.on("click", (e) => {
-        console.log(e);
-      });
     })()
-
-
-
 
 
   function makeMarker(
     abstractMarker, 
   ) {
-
     const marker = document.createElement("div");
     marker.classList.add("marker");
     marker.classList.add('fade-in-animation');
@@ -199,21 +204,15 @@
     const feature = abstractMarker.features[0];
 
     marker.innerHTML = `
-      <div class="parkerPointy"></div>
-      <div class="parkerBody">
+      <div class="markerPointy"></div>
+      <div class="markerBody">
         
-        <div class="parkerTop">
+        <div class="markerTop">
           ${feature.properties["name:en"] || feature.properties["name"]}
         </div>
         
-        <div class="parkerBottom">
-          <ul>
-            <li><b>Class:</b> ${feature.properties.class}</li>
-            <li><b>Capital:</b> ${feature.properties.capital}</li>
-            <li><b>Rank:</b> ${feature.properties.rank}</li>
-          </ul>
-
-
+        <div class="markerBottom">
+          <b>Rank:</b> ${feature.properties.rank}
         </div>
       </div>
     `
@@ -227,7 +226,6 @@
     marker.style.setProperty("height", `${abstractMarker.size[1]}px`);
     marker.style.setProperty("transform", `translate(${abstractMarker.position[0]}px, ${abstractMarker.position[1]}px)`);
   }
-
 
   </script>
 </body>
