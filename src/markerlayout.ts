@@ -1,16 +1,16 @@
 import { LngLatLike, Map as MapSDK, MapGeoJSONFeature } from "@maptiler/sdk";
 
 /**
- * How the popups are anchored to a given point
+ * How the markers are anchored to a given point
  */
-export type PopupAnchor = "center" | "top" | "bottom" | "left" | "right";
+export type MarkerAnchor = "center" | "top" | "bottom" | "left" | "right";
 
 /**
- * Minimalist set of properties that represent a popup
+ * Minimalist set of properties that represent a marker
  */
-export type AbstractPopup = {
+export type AbstractMarker = {
   /**
-   * Unique ID of a popup, most likely the ID of a geojson feature (from a vector tile)
+   * Unique ID of a marker, most likely the ID of a geojson feature (from a vector tile)
    */
   id: number;
 
@@ -25,42 +25,42 @@ export type AbstractPopup = {
   size: [number, number];
 
   /**
-   * The feature represented by the popup
+   * The feature represented by the marker
    */
   features: MapGeoJSONFeature[];
 
   /**
-   * Size of each internal elements (useful for when a popup contain information about multiple feature)
+   * Size of each internal elements (useful for when a marker contain information about multiple feature)
    */
   internalElementSize: [number, number];
 };
 
 /**
- * Hash map of AbstractPopup where IDs are unique and likely to come from vector tiles
+ * Hash map of AbstractMarker where IDs are unique and likely to come from vector tiles
  */
-export type PopupMap = Map<number, AbstractPopup>;
+export type MarkerMap = Map<number, AbstractMarker>;
 
 /**
- * Status of the popup compared to the previous status
+ * Status of the marker compared to the previous status
  */
-export type PopupStatus = {
+export type MarkerStatus = {
   /**
-   * The popups that were added since the last update
+   * The markers that were added since the last update
    */
-  new: PopupMap;
+  new: MarkerMap;
 
   /**
-   * The popups that were already present in the last update but had their position changed
+   * The markers that were already present in the last update but had their position changed
    */
-  updated: PopupMap;
+  updated: MarkerMap;
 
   /**
-   * The popups that are no longer present since the last update
+   * The markers that are no longer present since the last update
    */
-  removed: PopupMap;
+  removed: MarkerMap;
 };
 
-export type PopupManagerOptions = {
+export type MarkerLayoutOptions = {
   /**
    * IDs of layers to query for vector features.
    * Default: uses all the layers available
@@ -68,25 +68,25 @@ export type PopupManagerOptions = {
   layers?: Array<string>;
 
   /**
-   * Size of the popups on screen space [width, height].
+   * Size of the markers on screen space [width, height].
    * Default: `[150, 50]`
    */
-  popupSize?: [number, number];
+  markerSize?: [number, number];
 
   /**
-   * Maximum number of popups to keep.
+   * Maximum number of markers to keep.
    * Default: no maximum
    */
   max?: number;
 
   /**
-   * Position of the popup compared to its anchor point.
+   * Position of the marker compared to its anchor point.
    * Default: `"center"`
    */
-  popupAnchor?: PopupAnchor;
+  markerAnchor?: MarkerAnchor;
 
   /**
-   * Offset to apply to the popup, in number of pixel, relative to its anchor position.
+   * Offset to apply to the marker, in number of pixel, relative to its anchor position.
    * First element of the array is the horizontal offset where negative shifts towards
    * the left and positive shifts towards the right.
    * Second element of the array is the vertical offset where negative shifts towards
@@ -104,9 +104,11 @@ export type PopupManagerOptions = {
 
   /**
    * Property to sort the features by. If not provided, the features will not be sorted.
+   * Alternatively, the sorting property can be a function that takes the feature as
+   * argument and returns a number, aka. the sorting value (or rank)
    * Default: not provided
    */
-  sortingProperty?: string;
+  sortingProperty?: string | ((feature: MapGeoJSONFeature) => number);
 
   /**
    * Sorting order, only relevant if the option `.sortingProperty` is provided, or else will be ignored.
@@ -123,14 +125,14 @@ export type PopupManagerOptions = {
   groupBy?: string;
 
   /**
-   * Popups can contain multiple features, this parameter can be set to have a strict limit.
+   * Markers can contain multiple features, this parameter can be set to have a strict limit.
    * Default: `Infinity`
    */
-  maxNbFeaturesPerPopup?: number;
+  maxNbFeaturesPerMarker?: number;
 
   /**
-   * When a popup contains multiple features, its size can get bigger. This number is the max ratio applied to the
-   * defined `popupSize`. Intentionnaly non-integer so that the user can see there is still half an element to
+   * When a marker contains multiple features, its size can get bigger. This number is the max ratio applied to the
+   * defined `markerSize`. Intentionnaly non-integer so that the user can see there is still half an element to
    * show at the bottom and undestand they can scroll for more.
    * Default: `2.5`
    */
@@ -166,7 +168,7 @@ function getPointfeatureCoordinateHash(feature: MapGeoJSONFeature): string {
   return uiArr.join("_");
 }
 
-function doesCollide(a: AbstractPopup, b: AbstractPopup): boolean {
+function doesCollide(a: AbstractMarker, b: AbstractMarker): boolean {
   return !(
     b.position[0] > a.position[0] + a.size[0] ||
     b.position[0] + b.size[0] < a.position[0] ||
@@ -176,12 +178,12 @@ function doesCollide(a: AbstractPopup, b: AbstractPopup): boolean {
 }
 
 function doesCollideWithAny(
-  popup: AbstractPopup,
-  manyPopups: PopupMap,
+  marker: AbstractMarker,
+  manyMarkers: MarkerMap,
 ): boolean {
-  const popups = manyPopups.values();
-  for (const hitTestPopup of popups) {
-    if (doesCollide(popup, hitTestPopup)) {
+  const markers = manyMarkers.values();
+  for (const hitTestMarker of markers) {
+    if (doesCollide(marker, hitTestMarker)) {
       return true;
     }
   }
@@ -189,15 +191,15 @@ function doesCollideWithAny(
   return false;
 }
 
-export class PopupManager {
+export class MarkerLayout {
   /**
    * Style layer IDs to keep
    */
   private layers: Array<string> | undefined;
-  private popupSize: [number, number];
-  private popupAnchor: PopupAnchor;
+  private markerSize: [number, number];
+  private markerAnchor: MarkerAnchor;
   private map: MapSDK;
-  private lastStatus: PopupStatus;
+  private lastStatus: MarkerStatus;
   private max: number | null;
   private offset: [number, number] = [0, 0];
 
@@ -205,32 +207,33 @@ export class PopupManager {
    * This is a concat of lastStatus.new and lastStatus.updated
    * only for optimisation purposes
    */
-  private lastPresent: PopupMap;
+  private lastPresent: MarkerMap;
   private filter: null | ((feature: MapGeoJSONFeature) => boolean) = null;
   private groupBy: string | null = null;
   private maxRatioUnitSize: number;
-  private sortingProperty: string = "";
+  private sortingProperty: string | ((feature: MapGeoJSONFeature) => number) =
+    "";
   private sortingOrder: number = 1;
-  private maxNbFeaturesPerPopup: number = Infinity;
+  private maxNbFeaturesPerMarker: number = Infinity;
 
-  constructor(map: MapSDK, options: PopupManagerOptions = {}) {
+  constructor(map: MapSDK, options: MarkerLayoutOptions = {}) {
     this.map = map;
     this.layers = options.layers ?? undefined;
-    this.popupAnchor = options.popupAnchor ?? "center";
-    this.popupSize = options.popupSize ?? [150, 50];
+    this.markerAnchor = options.markerAnchor ?? "center";
+    this.markerSize = options.markerSize ?? [150, 50];
     this.max = options.max ?? null;
     this.lastStatus = {
-      new: new Map<number, AbstractPopup>(),
-      updated: new Map<number, AbstractPopup>(),
-      removed: new Map<number, AbstractPopup>(),
+      new: new Map<number, AbstractMarker>(),
+      updated: new Map<number, AbstractMarker>(),
+      removed: new Map<number, AbstractMarker>(),
     };
-    this.lastPresent = new Map<number, AbstractPopup>();
+    this.lastPresent = new Map<number, AbstractMarker>();
     this.filter = options.filter ?? null;
     this.offset = options.offset ?? [0, 0];
     this.groupBy = options.groupBy ?? null;
     this.maxRatioUnitSize = options.maxRatioUnitSize ?? 2.5;
     this.sortingProperty = options.sortingProperty ?? "";
-    this.maxNbFeaturesPerPopup = options.maxNbFeaturesPerPopup ?? Infinity;
+    this.maxNbFeaturesPerMarker = options.maxNbFeaturesPerMarker ?? Infinity;
 
     if (
       options.sortingOrder &&
@@ -247,22 +250,25 @@ export class PopupManager {
   private computeAnchorOffset(nbFeatures: number = 1): [number, number] {
     let anchorOffset: [number, number] = [0, 0];
 
-    if (this.popupAnchor === "center") {
+    if (this.markerAnchor === "center") {
       anchorOffset = [
-        -this.popupSize[0] / 2,
-        (nbFeatures * -this.popupSize[1]) / 2,
+        -this.markerSize[0] / 2,
+        (nbFeatures * -this.markerSize[1]) / 2,
       ];
-    } else if (this.popupAnchor === "top") {
-      anchorOffset = [-this.popupSize[0] / 2, nbFeatures * -this.popupSize[1]];
-    } else if (this.popupAnchor === "bottom") {
-      anchorOffset = [-this.popupSize[0] / 2, 0];
-    } else if (this.popupAnchor === "left") {
+    } else if (this.markerAnchor === "top") {
       anchorOffset = [
-        -this.popupSize[0],
-        (nbFeatures * -this.popupSize[1]) / 2,
+        -this.markerSize[0] / 2,
+        nbFeatures * -this.markerSize[1],
       ];
-    } else if (this.popupAnchor === "right") {
-      anchorOffset = [0, -this.popupSize[1]];
+    } else if (this.markerAnchor === "bottom") {
+      anchorOffset = [-this.markerSize[0] / 2, 0];
+    } else if (this.markerAnchor === "left") {
+      anchorOffset = [
+        -this.markerSize[0],
+        (nbFeatures * -this.markerSize[1]) / 2,
+      ];
+    } else if (this.markerAnchor === "right") {
+      anchorOffset = [0, -this.markerSize[1]];
     }
 
     anchorOffset[0] += this.offset[0];
@@ -272,26 +278,26 @@ export class PopupManager {
   }
 
   /**
-   * Updates only the position of an abstract popup. Soft updates are convenients
-   * for updating already existing popups without the need to debounce
+   * Updates only the position of an abstract marker. Soft updates are convenients
+   * for updating already existing markers without the need to debounce
    */
-  softUpdateAbstractPopup(abstractPopup: AbstractPopup) {
-    const lonLat = (abstractPopup.features[0].geometry as GeoJSON.Point)
+  softUpdateAbstractMarker(abstractMarker: AbstractMarker) {
+    const lonLat = (abstractMarker.features[0].geometry as GeoJSON.Point)
       .coordinates as LngLatLike;
     const screenspacePosition = this.map.project(lonLat);
     const nbFeatureToShow = Math.min(
-      abstractPopup.features.length,
+      abstractMarker.features.length,
       this.maxRatioUnitSize,
     );
     const anchorOffset = this.computeAnchorOffset(nbFeatureToShow);
-    abstractPopup.position[0] = screenspacePosition.x + anchorOffset[0];
-    abstractPopup.position[1] = screenspacePosition.y + anchorOffset[1];
+    abstractMarker.position[0] = screenspacePosition.x + anchorOffset[0];
+    abstractMarker.position[1] = screenspacePosition.y + anchorOffset[1];
   }
 
   /**
-   * Update the popup positions.
+   * Update the marker positions.
    */
-  update(): PopupStatus | null {
+  update(): MarkerStatus | null {
     if (!this.map) return null;
 
     // Collecting the features displayed in the viewport
@@ -308,16 +314,25 @@ export class PopupManager {
     }
 
     if (this.sortingProperty) {
-      // sorting the features by a property (eg. rank)
-      features = features
-        .filter((feature) => feature.properties[this.sortingProperty]) // the features must have the property to sort on
-        .sort(
+      if (typeof this.sortingProperty === "string") {
+        const sortingProp = this.sortingProperty;
+        // sorting the features by a property (eg. rank)
+        features = features
+          .filter((feature) => feature.properties[sortingProp]) // the features must have the property to sort on
+          .sort(
+            (a, b) =>
+              (a.properties[sortingProp] > b.properties[sortingProp] ? 1 : -1) *
+              this.sortingOrder,
+          ); // actual sorting
+      } else if (typeof this.sortingProperty === "function") {
+        // In this part, this.sortingProperty is a function that returns the sorting rank
+        const getSortingValue = this.sortingProperty;
+        features = features.sort(
           (a, b) =>
-            (a.properties[this.sortingProperty] >
-            b.properties[this.sortingProperty]
-              ? 1
-              : -1) * this.sortingOrder,
+            (getSortingValue(a) > getSortingValue(b) ? 1 : -1) *
+            this.sortingOrder,
         ); // actual sorting
+      }
     }
 
     // The keys of these groups are the values of tyhe parameter we want to group by
@@ -351,7 +366,7 @@ export class PopupManager {
           groupList.push(group);
         }
 
-        if (group.features.length < this.maxNbFeaturesPerPopup) {
+        if (group.features.length < this.maxNbFeaturesPerMarker) {
           group.features.push(feature);
         }
       }
@@ -367,9 +382,9 @@ export class PopupManager {
       // and is not reused afterwards
     }
 
-    const newPopups = new Map<number, AbstractPopup>();
-    const updatedPopups = new Map<number, AbstractPopup>();
-    const newPresent = new Map<number, AbstractPopup>();
+    const newMarkers = new Map<number, AbstractMarker>();
+    const updatedMarkers = new Map<number, AbstractMarker>();
+    const newPresent = new Map<number, AbstractMarker>();
 
     let featureCounter = 0;
 
@@ -386,61 +401,61 @@ export class PopupManager {
       const anchorOffset = this.computeAnchorOffset(nbFeatureToShow);
       const feature = group.features[0];
 
-      // The height of the popup is increased based on the number of features
-      // it contains, but we don't want the popup to be larger than this.maxRatioUnitSize
-      // the size of a "unit" popup (otherwise it could take the whole viewport)
-      const popupSize: [number, number] = [
-        this.popupSize[0],
-        this.popupSize[1] * nbFeatureToShow,
+      // The height of the marker is increased based on the number of features
+      // it contains, but we don't want the marker to be larger than this.maxRatioUnitSize
+      // the size of a "unit" marker (otherwise it could take the whole viewport)
+      const markerSize: [number, number] = [
+        this.markerSize[0],
+        this.markerSize[1] * nbFeatureToShow,
       ];
 
       const id: number = computeFeatureGroupId(group.features);
       const lonLat = (feature.geometry as GeoJSON.Point)
         .coordinates as LngLatLike;
       const screenspacePosition = this.map.project(lonLat);
-      const popup: AbstractPopup = {
+      const marker: AbstractMarker = {
         id,
         position: [
           screenspacePosition.x + anchorOffset[0],
           screenspacePosition.y + anchorOffset[1],
         ],
-        size: popupSize,
-        internalElementSize: [this.popupSize[0], this.popupSize[1]],
+        size: markerSize,
+        internalElementSize: [this.markerSize[0], this.markerSize[1]],
         features: group.features,
       };
 
-      if (doesCollideWithAny(popup, newPresent)) {
+      if (doesCollideWithAny(marker, newPresent)) {
         continue;
       }
 
-      newPresent.set(id, popup);
+      newPresent.set(id, marker);
 
       // if current feature was previously in 'new', then it's updated
       if (this.lastStatus.new.has(id)) {
-        updatedPopups.set(id, popup);
+        updatedMarkers.set(id, marker);
         this.lastPresent.delete(id);
       }
 
       // If current feature was previously in 'updated' , then it still is
       else if (this.lastStatus.updated.has(id)) {
-        updatedPopups.set(id, popup);
+        updatedMarkers.set(id, marker);
         this.lastPresent.delete(id);
       }
 
       // If current feature was in previous updated/new, then it is new now
       else {
-        newPopups.set(id, popup);
+        newMarkers.set(id, marker);
       }
 
       featureCounter++;
     }
 
     // All the features of this updates that have been part of the previous update have been deleted from this.lastPresent
-    // This means that this.lastPresent is the new removedPopups
+    // This means that this.lastPresent is the new removedMarkers
     this.lastStatus.removed = this.lastPresent;
     this.lastPresent = newPresent;
-    this.lastStatus.new = newPopups;
-    this.lastStatus.updated = updatedPopups;
+    this.lastStatus.new = newMarkers;
+    this.lastStatus.updated = updatedMarkers;
 
     return this.lastStatus;
   }

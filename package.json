@@ -1,14 +1,14 @@
 {
-  "name": "@maptiler/popup-manager",
+  "name": "@maptiler/marker-layout",
   "version": "1.0.0",
-  "description": "Popup manager for MapTiler SDK",
-  "module": "dist/maptiler-popup-manager.js",
-  "types": "dist/maptiler-popup-manager.d.ts",
+  "description": "Maker layout manager for MapTiler SDK, frontend framework agnostic",
+  "module": "dist/maptiler-marker-layout.mjs",
+  "types": "dist/maptiler-marker-layout.d.ts",
   "type": "module",
   "exports": {
     ".": {
-      "import": "./dist/maptiler-popup-manager.js",
-      "types": "./dist/maptiler-popup-manager.d.ts"
+      "import": "./dist/maptiler-marker-layout.mjs",
+      "types": "./dist/maptiler-marker-layout.d.ts"
     }
   },
   "publishConfig": {
@@ -36,7 +36,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/maptiler/maptiler-popup-manager-js.git"
+    "url": "https://github.com/maptiler/maptiler-marker-layout.git"
   },
   "license": "",
   "devDependencies": {

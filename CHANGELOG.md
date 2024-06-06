@@ -1,4 +1,4 @@
-# MapTiler Popup Manager Changelog
+# MapTiler Marker Layout Changelog
 
 ## DEVEL
 ### New Features
