@@ -1,69 +1,59 @@
-# MapTiler Popup Manager for MapTiler SDK
-The Popup Manager is a helper to create non-coliding popup overlays on top of MapTiler SDK. Fed by a **vector layer** from a tileset or from a GeoJSON source, it can be tuned with plenty of options.
-Thanks to its non opinionated and logic-only approach, it lets you bind any kind of rendering you wish for your popups: vanilla HTML Divs, React components, floating canvas, etc.
+# MapTiler Marker layout for MapTiler SDK
+The Marker Layout is a helper to create non-coliding marker overlays on top of MapTiler SDK. Fed by a **vector layer** from a tileset or from a GeoJSON source, it can be tuned with plenty of options.
+Thanks to its non opinionated and logic-only approach, it lets you bind any kind of rendering you wish for your markers: vanilla HTML Divs, React components, floating canvas, etc. as it computes the position and size of the markers but lets you take handle the rendering part.
 
 ## Some Examples
-Here is only a few examples of what's possible with fairly basic HTML popups.
+Here is only a few examples of what's possible with fairly basic HTML markers.
 
-With popups anchored to the city layers, directly fueled by the `Streets` style from MapTiler Cloud:
+With markers anchored to the city layers, directly fueled by the `streets-v2` style from MapTiler Cloud:
 ![](images/cities.png)
 
-With popups fuled by a "famous personnalities" layer we have been working on, using the Turbo color ramp (from MapTiler SDK) to highlight the rankink:
-![](images/people_light_europe.png)
-
-Same as above, but centered on Italy and filtered for the year 1975:
-![](images/people_light_italy.png)
-
-Same as above, but centered on the USA and filtered for the year 1975:
-![](images/people_light_usa.png)
-
-Popup can be of any size, so we can display more info and feature links to Wikidata page:
-![](images/people.png)
-
-Displaying weather data is also a nice usecase. For this, we bind popups to cities, towns and villages present in one of the official MapTiler Cloud style and then we asynchronously fetch the weather data using [MapTiler Weather library](https://www.maptiler.com/weather/), for each vector features using their coordinates:
+Displaying weather data is also a nice usecase. For this, we anchor the markers to cities, towns and villages from an official MapTiler Cloud style and then we asynchronously fetch the weather data using [MapTiler Weather library](https://www.maptiler.com/weather/), for each vector features using their coordinates:
 ![](images/weather_europe_large.png)
 ![](images/weather_usa_large.png)
 
-Smaller popups with transparent background is a nice way to avoid cluter. Icons are SVG animated:
+**But markers don't need to look like markers!** Smaller merkers with transparent background are a nice way to avoid cluter. Icons are SVG animated:
 ![](images/weather_minimal.png)
 
-Since popups are overlaying on top of a map, it's generally a good practice to keep them small, so that the basemap remains readable, but Popup manager does not technically enforce that.
+Since markers are overlaying on top of a map, it's generally a good practice to keep them small, so that the basemap remains readable, but **Marker Layout** does not technically enforce that.
 
 ## Some Concepts
-The Popup Manager...
-- computes screen-space popups logic windows
-- is fed with vector layer, using only the point features
+The Marker Layout...
+- computes screen-space bounding box logic
+- can be provided the desired marker size and relative anchor point
+- is fed with one or multiple vector layer
+- can only use *point* features
 - create non-overlapping bounding boxes
-- can filter and sort features
-- can group multiple features into each popup
-- when updated will retrieve three lists of popups relative to the previous state: the new popups, the removed popups and the moved popups
-- does not enforce how the the actual visual popups (eg. divs) should be created, cached, pooled, reused or deleted
-- will not create a popup if another one of higher importance (based on default or provided ranking) is overlaping
+- can filter and sort features based on vector feature properties
+- sorting can be done with a function, so that rank can come from an external source
+- can group multiple vector features into each marker
+- when updated will retrieve three lists of markers relative to the previous state: the new, the removed and the moved markers
+- does not enforce how the the actual visual markers (eg. divs) should be created, cached, pooled, reused or deleted
 
 ## Usage
 To install it:
 ```bash
-npm install @maptiler/popup-manager
+npm install @maptiler/marker-layout
 ```
 Then, import it:
 
 ```ts
-import { PopupManager } from "@maptiler/popup-manager";
+import { MarkerLayout } from "@maptiler/marker-layout";
 
 ...
 
-const popupManager = new PopupManager(map, options);
+const markerLayout = new MarkerLayout(map, options);
 ```
 
 
 Or it can be used from MapTiler Cloud CDN with vanilla JS:
 
 ```html
-<script src="https://cdn.maptiler.com/maptiler-popup-manager/v1.0.0/maptiler-popup-manager.umd.js"></script>
+<script src="https://cdn.maptiler.com/maptiler-marker-layout/v1.0.0/maptiler-marker-layout.umd.js"></script>
 ```
 And then be address as such:
 ```js
-const popupManager = new maptilerpopupmanager.PopupManager(map, options);
+const markerLayout = new maptilermarkerlayout.MarkerLayout(map, options);
 ```
 
 ### Options
@@ -77,25 +67,25 @@ Here are all the options available:
   layers?: Array<string>;
 
   /**
-   * Size of the popups on screen space [width, height].
+   * Size of the markers on screen space [width, height].
    * Default: `[150, 50]`
    */
-  popupSize?: [number, number];
+  markerSize?: [number, number];
 
   /**
-   * Maximum number of popups to keep.
+   * Maximum number of markers to keep.
    * Default: no maximum
    */
   max?: number;
 
   /**
-   * Position of the popup compared to its anchor point.
+   * Position of the marker relative to its anchor point.
    * Default: `"center"`
    */
-  popupAnchor?: PopupAnchor;
+  markerAnchor?: MarkerAnchor;
 
   /**
-   * Offset to apply to the popup, in number of pixel, relative to its anchor position.
+   * Offset to apply to the marker, in number of pixel, relative to its anchor position.
    * First element of the array is the horizontal offset where negative shifts towards
    * the left and positive shifts towards the right.
    * Second element of the array is the vertical offset where negative shifts towards
@@ -118,10 +108,12 @@ Here are all the options available:
   sortingProperty?: string,
 
   /**
-   * Sorting order, only relevant if the option `.sortingProperty` is provided, or else will be ignored.
-   * Default: `"ascending"`
+   * Property to sort the features by. If not provided, the features will not be sorted.
+   * Alternatively, the sorting property can be a function that takes the feature as
+   * argument and returns a number, aka. the sorting value (or rank)
+   * Default: not provided
    */
-  sortingOrder?: "ascending" | "descending",
+  sortingProperty?: string | ((feature: MapGeoJSONFeature) => number);
 
   /**
    * Property to group by. The property must be present in the `properties` object of the feature
@@ -132,32 +124,35 @@ Here are all the options available:
   groupBy?: string,
 
   /**
-   * Popups can contain multiple features, this parameter can be set to have a strict limit.
+   * Markers can contain multiple vector features, this parameter can be set to have a strict limit.
    * Default: `Infinity`
    */
-  maxNbFeaturesPerPopup?: number,
+  maxNbFeaturesPerMarker?: number,
 
   /**
-   * When a popup contains multiple features, its size can get bigger. This number is the max ratio applied to the
-   * defined `popupSize`. Intentionnaly non-integer so that the user can see there is still half an element to
+   * When a marker contains multiple features, its size can get bigger. This number is the max ratio applied to the
+   * defined `markerSize`. Intentionnaly non-integer so that the user can see there is still half an element to
    * show at the bottom and undestand they can scroll for more.
    * Default: `2.5`
    */
   maxRatioUnitSize?: number,
 }
+
+// The possible anchor points
+type MarkerAnchor = "center" | "top" | "bottom" | "left" | "right";
 ```
 
 ## API
 Appart from the constructor, there are a few things to get familiar with.
 
-### AbstractPopup
-They are simple data structure that hold informations about the popup (position, size)
+### AbstractMarker
+They are simple data structure that hold informations about a marker (position, size)
 and the list of vector features it is supposed to contain. Here is how it looks like:
 
 ```ts
-type AbstractPopup = {
+type AbstractMarker = {
   /**
-   * Unique ID of a popup, most likely the ID of a geojson feature (from a vector tile)
+   * Unique ID of a marker, most likely the ID of a geojson feature (from a vector tile)
    */
   id: number;
 
@@ -172,100 +167,63 @@ type AbstractPopup = {
   size: [number, number];
 
   /**
-   * The feature represented by the popup
+   * The feature represented by the marker
    */
   features: MapGeoJSONFeature[];
 
   /**
-   * Size of each internal elements (useful for when a popup contain information about multiple feature)
+   * Size of each internal elements (useful for when a marker contain multiple vector features)
    */
   internalElementSize: [number, number],
 };
 ```
-Again, an *abstract popup* is **not** an actual visual popup. It only aims at providing the information to help making an actual popup.
+Again, an *abstract marker* is **not** an actual visual marker. It only aims at providing the information to help making an actual graphic representation of a marker.
 
-### PopupMap
-The type `PopupMap` is simply a [JS Map](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map) of `AbstractPopup`
+### MarkerMap
+The type `MarkerMap` is simply a [JS Map](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map) of `AbstractMarker`. The *key* of this map (*number*) is a hash specific to one of multiple vector features contained by a marker. If you want to add an extra caching logic, you may want to track this ID, otherwise it's only used internaly and is of little interest at application level.
 
 ```ts
-type PopupMap = Map<number, AbstractPopup>;
+type MarkerMap = Map<number, AbstractMarker>;
 ```
 
-### PopupStatus
-An object of type *PopupStatus* is a simple data structure that contain li
+### markerStatus
+An object of type *markerStatus* is a simple data structure that contain li
 
 ```ts
 /**
- * Status of the popup compared to the previous status
+ * Status of the marker compared to the previous status
  */
-type PopupStatus = {
+type MarkerStatus = {
   /**
-   * The popups that were added since the last update
+   * The markers that were added since the last update()
    */
-  new: PopupMap;
+  new: MarkerMap;
 
   /**
-   * The popups that were already present in the last update but had their position changed
+   * The markers that were already present in the last update but had their position changed
    */
-  updated: PopupMap;
+  updated: MarkerMap;
 
   /**
-   * The popups that are no longer present since the last update
+   * The markers that are no longer present since the last update
    */
-  removed: PopupMap;
+  removed: MarkerMap;
 };
 ```
 
 ### Updating
-As we interact with the map (pan, zoom, rotation, etc.) we need to know weither new popups are now visible, or just moved outside of the viewport and the updated positions of the ones that, since the last update, are visible.
+As we interact with the map (pan, zoom, rotation, etc.) we need to know which markers are now visible, disapeared outside the viewport or are still visible but at a different (screen space) location.
 
-For this, a `PopupManager` instance has two methods: `.update()` and `.softUpdateAbstractPopup()`
+To compute this, a `MarkerLayout` instance has two methods:
+- `.update()` compute a complete new status of markers, returning a `MarkerStatus`.  
+In case many vector features are found in the specified `layers` with the provided `filter`, this may have an impact on performances and may not be suitable to call from a `map.on("move", () => { ... })` event.
 
-- `.update()` can be called everytime we need to update the position and content of all the abstract popups. This method return
+
+- `.softUpdateAbstractMarker(am)` only update a single `AbstractMarker` with a new screenspace position.  
+This is convenient to use when there are hundreds of vector features found but we only want to update the position, say, of the ones retrieved with the previous full `.update()` call. In this performance-wise conservative mode, one would typically bind `.update()` to the `Map` event `"idle"` and bind `.softUpdateAbstractMarker(am)` to the `Map` event `"move"`.
 
 
 ## Examples
-Here is an example:
-```js
-const popupManager = new PopupManager(map, {
-  // Select features from those two layers
-  layers: ["culture_layer", "science_layer"],
-
-  // Popup size are planned to be 160x20, so collision will be computed accordingly
-  popupSize: [160, 20],
-
-  // The popups will be placed on top of each point feature
-  popupAnchor: "top",
-
-  // This offset will be applied to the anchor because we want
-  // to display a small pointy tip at the bottom of the popup
-  offset: [0, -10],
-
-  // We want to group the popups by coordinates
-  groupBy: "coordinates",
-
-  // The size of a popup can be at most 5 times the height of a unit popup
-  // (5 x 20 as defined above in the option popupSize). This size will be
-  // reached only by popups that contain a group of 5 or more elements
-  maxRatioUnitSize: 5,
-
-  // We want to sort by the property `rank`
-  sortingProperty: "rank",
-
-  // The sorting is in ascending order (lowest rank values get the priority)
-  sortingOrder: "ascending",
-
-  // When grouping, we may want popup to not reference more than a certain number of
-  // features. This is a cutoff value.
-  // Not to be confused with `.maxRatioUnitSize`, which is only about the graphic size,
-  // but could have an internal scrolling to display up to `maxNbFeaturesPerPopup` elements.
-  maxNbFeaturesPerPopup: 6,
-
-  // We want to apply a dynamic filtering (called with every `.update()`) where we discard
-  // features that have a `rank` property greater than 20000.
-  // This can be used for all sort of filetering, eg. features inside a dynamic bounding box
-  filter: (feature) => {
-    return feature.properties.rank < 20000
-  },
-});
-```
+You can find two examples in this repo:
+- demo using only `.update()` [here](demos/cities.html)
+- demo using both `.update()` and `.softUpdateAbstractMarker()` [here](demos/cities-many.html)

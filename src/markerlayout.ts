@@ -80,7 +80,7 @@ export type MarkerLayoutOptions = {
   max?: number;
 
   /**
-   * Position of the marker compared to its anchor point.
+   * Position of the marker relative to its anchor point.
    * Default: `"center"`
    */
   markerAnchor?: MarkerAnchor;
