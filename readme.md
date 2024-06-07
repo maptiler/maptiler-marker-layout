@@ -12,7 +12,7 @@ Displaying weather data is also a nice usecase. For this, we anchor the markers 
 ![](images/weather_europe_large.png)
 ![](images/weather_usa_large.png)
 
-**But markers don't need to look like markers!** Smaller merkers with transparent background are a nice way to avoid cluter. Icons are SVG animated:
+**But markers don't need to look like markers!** Smaller markers with transparent background are a nice way to avoid cluter. Icons are SVG animated:
 ![](images/weather_minimal.png)
 
 Since markers are overlaying on top of a map, it's generally a good practice to keep them small, so that the basemap remains readable, but **Marker Layout** does not technically enforce that.
@@ -186,7 +186,7 @@ The type `MarkerMap` is simply a [JS Map](https://developer.mozilla.org/en-US/do
 type MarkerMap = Map<number, AbstractMarker>;
 ```
 
-### markerStatus
+### MarkerStatus
 An object of type *markerStatus* is a simple data structure that contain li
 
 ```ts
