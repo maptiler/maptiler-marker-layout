@@ -6,3 +6,6 @@ vite*
 .github
 .eslintrc.cjs 
 demos
+images
+CHANGELOG.md
+build
