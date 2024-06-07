@@ -1,6 +1,5 @@
 # MapTiler Marker Layout Changelog
 
-## DEVEL
+## 1.0.0
 ### New Features
-### Bug Fixes
-### Others
+- First version

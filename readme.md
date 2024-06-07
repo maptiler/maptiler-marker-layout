@@ -1,3 +1,19 @@
+<p align="center">
+<a href="https://docs.maptiler.com/sdk-js/modules/marker-layout">official page →</a><br>
+  <img src="images/maptiler-logo.svg" width="300px">
+</p>
+
+<p align="center" style="color: #AAA">
+  Better and customizable markers for <a href="https://www.maptiler.com/cloud/">MapTiler Cloud</a> and <a href="https://docs.maptiler.com/sdk-js">MapTiler SDK JS</a>
+</p>
+
+<p align="center">
+  <img src="images/JS-logo.svg" width="20px">
+  <img src="images/TS-logo.svg" width="20px">
+  <img src="https://img.shields.io/npm/v/@maptiler/marker-layout"></img>
+  <img src="https://img.shields.io/twitter/follow/maptiler?style=social"></img>
+</p>
+
 # MapTiler Marker layout for MapTiler SDK
 The Marker Layout is a helper to create non-coliding marker overlays on top of MapTiler SDK. Fed by a **vector layer** from a tileset or from a GeoJSON source, it can be tuned with plenty of options.
 Thanks to its non opinionated and logic-only approach, it lets you bind any kind of rendering you wish for your markers: vanilla HTML Divs, React components, floating canvas, etc. as it computes the position and size of the markers but lets you take handle the rendering part.
@@ -229,3 +245,6 @@ We can also reset the internal `MarkerStatus` if we need to restart from a blank
 You can find two examples in this repo:
 - demo using only `.update()` [here](demos/cities.html)
 - demo using both `.update()` and `.softUpdateAbstractMarker()` [here](demos/cities-many.html)
+
+## License
+See [license.md](license.md)
