@@ -1,14 +1,14 @@
 {
-  "name": "@maptiler/popup-manager",
+  "name": "@maptiler/marker-layout",
   "version": "1.0.0",
-  "description": "Popup manager for MapTiler SDK",
-  "module": "dist/maptiler-popup-manager.js",
-  "types": "dist/maptiler-popup-manager.d.ts",
+  "description": "Maker layout manager for MapTiler SDK, frontend framework agnostic",
+  "module": "dist/maptiler-marker-layout.mjs",
+  "types": "dist/maptiler-marker-layout.d.ts",
   "type": "module",
   "exports": {
     ".": {
-      "import": "./dist/maptiler-popup-manager.js",
-      "types": "./dist/maptiler-popup-manager.d.ts"
+      "import": "./dist/maptiler-marker-layout.mjs",
+      "types": "./dist/maptiler-marker-layout.d.ts"
     }
   },
   "publishConfig": {
@@ -36,22 +36,22 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/maptiler/maptiler-popup-manager-js.git"
+    "url": "https://github.com/maptiler/maptiler-marker-layout.git"
   },
   "license": "",
   "devDependencies": {
-    "@types/node": "^20.11.5",
-    "@typescript-eslint/eslint-plugin": "^6.19.0",
-    "@typescript-eslint/parser": "^6.19.0",
-    "eslint": "^8.56.0",
+    "@types/node": "^20.14.2",
+    "@typescript-eslint/eslint-plugin": "^7.12.0",
+    "@typescript-eslint/parser": "^7.12.0",
+    "eslint": "^8.57.0",
     "eslint-import-resolver-typescript": "^3.6.1",
     "eslint-plugin-import": "^2.29.1",
-    "prettier": "^3.2.4",
-    "typescript": "^5.3.3",
-    "vite": "^5.0.12",
-    "vite-plugin-dts": "^3.7.1"
+    "prettier": "^3.3.1",
+    "typescript": "^5.4.5",
+    "vite": "^5.2.12",
+    "vite-plugin-dts": "^3.9.1"
   },
   "dependencies": {
-    "@maptiler/sdk": "^1.2.1"
+    "@maptiler/sdk": "^2.0.3"
   }
 }
