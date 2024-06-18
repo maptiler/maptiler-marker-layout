@@ -112,3 +112,5 @@ tests/
 build/
 dist/
 docs/
+
+package-lock.json
