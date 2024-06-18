@@ -11,10 +11,6 @@
       "types": "./dist/maptiler-marker-layout.d.ts"
     }
   },
-  "publishConfig": {
-    "access": "restricted",
-    "registry": "https://npm.pkg.github.com/maptiler"
-  },
   "author": "MapTiler Team",
   "keywords": [
     "maptiler",
