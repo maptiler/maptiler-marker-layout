@@ -1,6 +1,6 @@
 {
   "name": "@maptiler/marker-layout",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Maker layout manager for MapTiler SDK, frontend framework agnostic",
   "module": "dist/maptiler-marker-layout.mjs",
   "types": "dist/maptiler-marker-layout.d.ts",
@@ -12,6 +12,11 @@
     }
   },
   "author": "MapTiler Team",
+  "homepage": "https://docs.maptiler.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/maptiler/maptiler-marker-layout.git"
+  },
   "keywords": [
     "maptiler",
     "plugin",
