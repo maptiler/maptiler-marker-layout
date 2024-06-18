@@ -15,7 +15,7 @@
     "access": "restricted",
     "registry": "https://npm.pkg.github.com/maptiler"
   },
-  "author": "MapTiler",
+  "author": "MapTiler Team",
   "keywords": [
     "maptiler",
     "plugin",
@@ -34,10 +34,6 @@
     "build-es": "tsc && vite build -c vite.config-es.ts",
     "build-umd-dev-watch": "tsc && NODE_ENV=development vite build -w -c vite.config-umd.ts"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/maptiler/maptiler-marker-layout.git"
-  },
   "license": "",
   "devDependencies": {
     "@types/node": "^20.14.2",
@@ -52,6 +48,6 @@
     "vite-plugin-dts": "^3.9.1"
   },
   "dependencies": {
-    "@maptiler/sdk": "^2.0.3"
+    "@maptiler/sdk": "^2.1.0"
   }
 }
