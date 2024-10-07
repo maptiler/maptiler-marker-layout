@@ -7,3 +7,8 @@
 ## 1.0.1
 ### Bug Fixes
 - Add homepage and git repo in package.json
+
+## 1.2.0
+### Others
+- Update SDK version
+- Fixing some TS type imports

@@ -1,4 +1,8 @@
-import { LngLatLike, Map as MapSDK, MapGeoJSONFeature } from "@maptiler/sdk";
+import type {
+  LngLatLike,
+  Map as MapSDK,
+  MapGeoJSONFeature,
+} from "@maptiler/sdk";
 
 /**
  * How the markers are anchored to a given point
@@ -213,8 +217,8 @@ export class MarkerLayout {
   private maxRatioUnitSize: number;
   private sortingProperty: string | ((feature: MapGeoJSONFeature) => number) =
     "";
-  private sortingOrder: number = 1;
-  private maxNbFeaturesPerMarker: number = Infinity;
+  private sortingOrder = 1;
+  private maxNbFeaturesPerMarker: number = Number.POSITIVE_INFINITY;
 
   constructor(map: MapSDK, options: MarkerLayoutOptions = {}) {
     this.map = map;
@@ -233,7 +237,8 @@ export class MarkerLayout {
     this.groupBy = options.groupBy ?? null;
     this.maxRatioUnitSize = options.maxRatioUnitSize ?? 2.5;
     this.sortingProperty = options.sortingProperty ?? "";
-    this.maxNbFeaturesPerMarker = options.maxNbFeaturesPerMarker ?? Infinity;
+    this.maxNbFeaturesPerMarker =
+      options.maxNbFeaturesPerMarker ?? Number.POSITIVE_INFINITY;
 
     if (
       options.sortingOrder &&
@@ -247,7 +252,7 @@ export class MarkerLayout {
     this.sortingOrder = options.sortingOrder === "descending" ? -1 : 1;
   }
 
-  private computeAnchorOffset(nbFeatures: number = 1): [number, number] {
+  private computeAnchorOffset(nbFeatures = 1): [number, number] {
     let anchorOffset: [number, number] = [0, 0];
 
     if (this.markerAnchor === "center") {
