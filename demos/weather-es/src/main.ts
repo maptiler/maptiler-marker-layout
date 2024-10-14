@@ -10,7 +10,7 @@ import {
 } from "@maptiler/weather";
 import './style.css'
 import { makeMarker, updateMarkerDiv } from "./markermaker";
-import { AbstractMarker, MarkerLayout, MarkerStatus } from "./marker-layout/src/markerlayout";
+import { type AbstractMarker, MarkerLayout, type MarkerStatus } from "./marker-layout/src/markerlayout";
 
 
 (async () => {

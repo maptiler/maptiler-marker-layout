@@ -1,6 +1,6 @@
-import { PrecipitationLayer, RadarLayer, TemperatureLayer } from "@maptiler/weather";
+import type { PrecipitationLayer, RadarLayer, TemperatureLayer } from "@maptiler/weather";
 import * as suncalc from "suncalc";
-import { AbstractMarker } from "./marker-layout/src/markerlayout";
+import type { AbstractMarker } from "./marker-layout/src/markerlayout";
 import "./marker-style.css";
 
 export function makeMarker(
