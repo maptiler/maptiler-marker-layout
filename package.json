@@ -1,6 +1,6 @@
 {
   "name": "@maptiler/marker-layout",
-  "version": "1.2.0",
+  "version": "2.0.0-rc.1",
   "description": "Maker layout manager for MapTiler SDK, frontend framework agnostic",
   "module": "dist/maptiler-marker-layout.mjs",
   "types": "dist/maptiler-marker-layout.d.ts",
@@ -49,6 +49,6 @@
     "vite-plugin-dts": "^3.9.1"
   },
   "dependencies": {
-    "@maptiler/sdk": "^2.3.0"
+    "@maptiler/sdk": "^3.0.0-rc.2"
   }
 }
