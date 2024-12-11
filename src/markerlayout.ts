@@ -3,7 +3,26 @@ import type {
   Map as MapSDK,
   MapGeoJSONFeature,
 } from "@maptiler/sdk";
-import { registerTelemetry } from "./telemetry";
+
+import packagejson from "../package.json";
+
+/**
+ * TODO: Remove when telemetry will be implemented
+ */
+declare module "@maptiler/sdk" {
+  interface Map {
+    telemetry: {
+      registerModule: (name: string, version: string) => void;
+    };
+  }
+}
+
+MapSDK.prototype.telemetry = {
+  registerModule: (name: string, version: string) => {
+    console.log(`Telemetry module registered: ${name} ${version}`);
+  },
+};
+/* *** */
 
 /**
  * How the markers are anchored to a given point
@@ -222,7 +241,7 @@ export class MarkerLayout {
   private maxNbFeaturesPerMarker: number = Number.POSITIVE_INFINITY;
 
   constructor(map: MapSDK, options: MarkerLayoutOptions = {}) {
-    registerTelemetry(map);
+    map.telemetry.registerModule(packagejson.name, packagejson.version);
 
     this.map = map;
     this.layers = options.layers ?? undefined;
