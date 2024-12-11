@@ -3,6 +3,7 @@ import type {
   Map as MapSDK,
   MapGeoJSONFeature,
 } from "@maptiler/sdk";
+import { registerTelemetry } from "./telemetry";
 
 /**
  * How the markers are anchored to a given point
@@ -221,6 +222,8 @@ export class MarkerLayout {
   private maxNbFeaturesPerMarker: number = Number.POSITIVE_INFINITY;
 
   constructor(map: MapSDK, options: MarkerLayoutOptions = {}) {
+    registerTelemetry(map);
+
     this.map = map;
     this.layers = options.layers ?? undefined;
     this.markerAnchor = options.markerAnchor ?? "center";
