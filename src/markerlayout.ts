@@ -7,24 +7,6 @@ import type {
 import packagejson from "../package.json";
 
 /**
- * TODO: Remove when telemetry will be implemented
- */
-declare module "@maptiler/sdk" {
-  interface Map {
-    telemetry: {
-      registerModule: (name: string, version: string) => void;
-    };
-  }
-}
-
-MapSDK.prototype.telemetry = {
-  registerModule: (name: string, version: string) => {
-    console.log(`Telemetry module registered: ${name} ${version}`);
-  },
-};
-/* *** */
-
-/**
  * How the markers are anchored to a given point
  */
 export type MarkerAnchor = "center" | "top" | "bottom" | "left" | "right";
