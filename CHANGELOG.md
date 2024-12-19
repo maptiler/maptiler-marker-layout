@@ -1,5 +1,9 @@
 # MapTiler Marker Layout Changelog
 
+## 2.0.0-rc.1
+### Other
+- Updating with SDK v3 rc (globe)
+
 ## 1.0.0
 ### New Features
 - First version

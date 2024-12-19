@@ -112,3 +112,4 @@ tests/
 build/
 dist/
 docs/
+tmp_*
