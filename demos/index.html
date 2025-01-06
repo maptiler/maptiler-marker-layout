@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MapTiler Marker layout for MapTiler SDK</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css" />
+</head>
+
+<body>
+  <h1>MapTiler Marker layout for MapTiler SDK Examples</h1>
+  <ul>
+    <li>
+      <a href="cities-many.html?key=">Cities many</a>
+    </li>
+    <li>
+      <a href="cities.html?key=">Cities</a>
+    </li>
+  </ul>
+
+  <script type="module">
+    document.querySelectorAll("a").forEach((a) => {
+      a.href += import.meta.env.VITE_API_KEY;
+    });
+  </script>
+</body>
+
+</html>

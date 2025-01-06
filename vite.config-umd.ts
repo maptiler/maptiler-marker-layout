@@ -10,7 +10,7 @@ export default defineConfig({
   build: {
     outDir: "build",
     minify: isProduction,
-    sourcemap: !isProduction,
+    sourcemap: true,
     lib: {
       entry: resolve(__dirname, "src/markerlayout.ts"),
       name: "maptilermarkerlayout",

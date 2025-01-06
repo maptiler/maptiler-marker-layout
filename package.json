@@ -28,18 +28,20 @@
     "format:fix": "prettier --write \"src/**/*.{js,ts,tsx}\"",
     "lint:fix": "eslint --fix \"src/**/*.{js,ts}\"",
     "make": "npm run format:fix && npm run lint:fix && npm run build",
-    "dev": "vite -c vite.config-es.ts",
     "build": "npm run build-es; npm run build-umd",
     "build-dev": "NODE_ENV=development npm run build-es; NODE_ENV=development npm run build-umd",
     "build-umd": "tsc && vite build -c vite.config-umd.ts",
     "build-es": "tsc && vite build -c vite.config-es.ts",
-    "build-umd-dev-watch": "tsc && NODE_ENV=development vite build -w -c vite.config-umd.ts"
+    "dev": "concurrently \"vite -c vite.config-dev.ts\" \"npm run dev-umd\"",
+    "dev-umd": "tsc && NODE_ENV=development vite build -w -c vite.config-umd.ts",
+    "ncu": "npx npm-check-updates"
   },
   "license": "",
   "devDependencies": {
     "@types/node": "^20.14.2",
     "@typescript-eslint/eslint-plugin": "^7.12.0",
     "@typescript-eslint/parser": "^7.12.0",
+    "concurrently": "^9.1.2",
     "eslint": "^8.57.0",
     "eslint-import-resolver-typescript": "^3.6.1",
     "eslint-plugin-import": "^2.29.1",
