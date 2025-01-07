@@ -10,14 +10,13 @@ export default defineConfig({
   build: {
     outDir: "build",
     minify: isProduction,
-    sourcemap: !isProduction,
+    sourcemap: true,
     lib: {
       entry: resolve(__dirname, "src/markerlayout.ts"),
-      name: 'maptilermarkerlayout',
-      fileName: (format, entryName) => "maptiler-marker-layout.umd.js",
-      formats: ['umd'],
+      name: "maptilermarkerlayout",
+      fileName: () => "maptiler-marker-layout.umd.min.js",
+      formats: ["umd"],
     },
-    
     rollupOptions: {
       external: [
         "@maptiler/sdk",

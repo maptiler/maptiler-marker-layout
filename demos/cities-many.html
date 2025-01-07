@@ -6,11 +6,11 @@
   <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
 
   <!-- Import MapTiler SDK -->
-  <script src="https://cdn.maptiler.com/maptiler-sdk-js/v2.4.0/maptiler-sdk.umd.min.js"></script>
-  <link href="https://cdn.maptiler.com/maptiler-sdk-js/v2.4.0/maptiler-sdk.css" rel="stylesheet" />
+  <script src="https://cdn.maptiler.com/maptiler-sdk-js/v3.0.0/maptiler-sdk.umd.min.js"></script>
+  <link href="https://cdn.maptiler.com/maptiler-sdk-js/v3.0.0/maptiler-sdk.css" rel="stylesheet" />
 
   <!-- Import MapTiler Maker Layout -->
-  <script src="../build/maptiler-marker-layout.umd.js"></script>
+  <script src="../build/maptiler-marker-layout.umd.min.js"></script>
 
   <style>
     body {
@@ -103,12 +103,21 @@
 
   <script>
     const appContainer = document.getElementById('map');
-    maptilersdk.config.apiKey = 'YOUR_API_KEY';
+
+    maptilersdk.config.apiKey = new URLSearchParams(location.search).get("key") || "API_KEY";
+
+    if (maptilersdk.config.apiKey === "API_KEY") {
+      const errorMessage = "MapTiler API key is missing. Please use URL `key` parameter to set it (`?key=XXXXX`).";
+      
+      alert(errorMessage);
+      throw new Error(errorMessage);
+    }
 
     const map = new maptilersdk.Map({
       container: appContainer,
       hash: true,
       geolocate: true,
+      projectionControl: true,
     });
 
     // Creating the div that will contain all the markers

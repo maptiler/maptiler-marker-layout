@@ -4,6 +4,8 @@ import type {
   MapGeoJSONFeature,
 } from "@maptiler/sdk";
 
+import packagejson from "../package.json";
+
 /**
  * How the markers are anchored to a given point
  */
@@ -221,6 +223,8 @@ export class MarkerLayout {
   private maxNbFeaturesPerMarker: number = Number.POSITIVE_INFINITY;
 
   constructor(map: MapSDK, options: MarkerLayoutOptions = {}) {
+    map.telemetry.registerModule(packagejson.name, packagejson.version);
+
     this.map = map;
     this.layers = options.layers ?? undefined;
     this.markerAnchor = options.markerAnchor ?? "center";
