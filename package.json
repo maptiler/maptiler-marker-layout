@@ -1,6 +1,6 @@
 {
   "name": "@maptiler/marker-layout",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Maker layout manager for MapTiler SDK, frontend framework agnostic",
   "module": "dist/maptiler-marker-layout.mjs",
   "types": "dist/maptiler-marker-layout.d.ts",

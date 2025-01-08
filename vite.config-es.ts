@@ -4,11 +4,6 @@ import dts from 'vite-plugin-dts';
 
 const isProduction = process.env.NODE_ENV === "production";
 
-const plugins = [
-  dts({insertTypesEntry: true}),
-];
-
-
 export default defineConfig({
   mode: isProduction ? "production" : "development",
   build: {
@@ -30,5 +25,10 @@ export default defineConfig({
       },
     },
   },
-  plugins,
-})
+  plugins: [
+    dts({
+      insertTypesEntry: true,
+      entryRoot: "src",
+    }),
+  ],
+});
