@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>MapTiler Cities</title>
   <meta charset="utf-8" />
@@ -84,30 +85,32 @@
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
     }
 
     .fade-in-animation {
       animation: fadeIn 0.5s ease forwards;
     }
-
   </style>
 </head>
 
 <body>
-
   <div id="map"></div>
 
   <script>
-   
     const appContainer = document.getElementById('map');
 
     maptilersdk.config.apiKey = new URLSearchParams(location.search).get("key") || "API_KEY";
 
     if (maptilersdk.config.apiKey === "API_KEY") {
       const errorMessage = "MapTiler API key is missing. Please use URL `key` parameter to set it (`?key=XXXXX`).";
-      
+
       alert(errorMessage);
       throw new Error(errorMessage);
     }
@@ -180,59 +183,54 @@
 
       map.on("moveend", () => {
         map.once("idle", updateMarkers);
-      })
+      });
 
+      // Full markers update when the projection changes (Globe <-> Mercator)
+      map.on("projectiontransition", updateMarkers);
+
+      // Full markers update at init
       updateMarkers();
     })()
 
+    function makeMarker(abstractMarker) {
+      const marker = document.createElement("div");
+      marker.classList.add("marker");
+      marker.classList.add('fade-in-animation');
+      marker.style.setProperty("width", `${abstractMarker.size[0]}px`);
+      marker.style.setProperty("height", `${abstractMarker.size[1]}px`);
+      marker.style.setProperty("transform", `translate(${abstractMarker.position[0]}px, ${abstractMarker.position[1]}px)`);
+
+      const feature = abstractMarker.features[0];
+
+      marker.innerHTML = `
+        <div class="markerPointy"></div>
+        <div class="markerBody">
+          
+          <div class="markerTop">
+            ${feature.properties["name:en"] || feature.properties["name"]}
+          </div>
+          
+          <div class="markerBottom">
+            <ul>
+              <li><b>Class:</b> ${feature.properties.class}</li>
+              <li><b>Capital:</b> ${feature.properties.capital}</li>
+              <li><b>Rank:</b> ${feature.properties.rank}</li>
+            </ul>
 
 
-
-
-  function makeMarker(
-    abstractMarker, 
-  ) {
-
-    const marker = document.createElement("div");
-    marker.classList.add("marker");
-    marker.classList.add('fade-in-animation');
-    marker.style.setProperty("width", `${abstractMarker.size[0]}px`);
-    marker.style.setProperty("height", `${abstractMarker.size[1]}px`);
-    marker.style.setProperty("transform", `translate(${abstractMarker.position[0]}px, ${abstractMarker.position[1]}px)`);
-
-    const feature = abstractMarker.features[0];
-
-    marker.innerHTML = `
-      <div class="markerPointy"></div>
-      <div class="markerBody">
-        
-        <div class="markerTop">
-          ${feature.properties["name:en"] || feature.properties["name"]}
+          </div>
         </div>
-        
-        <div class="markerBottom">
-          <ul>
-            <li><b>Class:</b> ${feature.properties.class}</li>
-            <li><b>Capital:</b> ${feature.properties.capital}</li>
-            <li><b>Rank:</b> ${feature.properties.rank}</li>
-          </ul>
+      `
 
+      return marker;
+    };
 
-        </div>
-      </div>
-    `
-
-    return marker;
-  }
-
-
-  function updateMarkerDiv(abstractMarker, marker) {
-    marker.style.setProperty("width", `${abstractMarker.size[0]}px`);
-    marker.style.setProperty("height", `${abstractMarker.size[1]}px`);
-    marker.style.setProperty("transform", `translate(${abstractMarker.position[0]}px, ${abstractMarker.position[1]}px)`);
-  }
-
-
+    function updateMarkerDiv(abstractMarker, marker) {
+      marker.style.setProperty("width", `${abstractMarker.size[0]}px`);
+      marker.style.setProperty("height", `${abstractMarker.size[1]}px`);
+      marker.style.setProperty("transform", `translate(${abstractMarker.position[0]}px, ${abstractMarker.position[1]}px)`);
+    };
   </script>
 </body>
+
 </html>
