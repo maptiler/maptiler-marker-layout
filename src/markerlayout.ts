@@ -260,7 +260,7 @@ export class MarkerLayout {
 
   private fireMoveEnd = () => {
     this.map.fire("moveend");
-  }
+  };
 
   private computeAnchorOffset(nbFeatures = 1): [number, number] {
     let anchorOffset: [number, number] = [0, 0];
