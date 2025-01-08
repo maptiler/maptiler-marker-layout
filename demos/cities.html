@@ -185,9 +185,6 @@
         map.once("idle", updateMarkers);
       });
 
-      // Full markers update when the projection changes (Globe <-> Mercator)
-      map.on("projectiontransition", updateMarkers);
-
       // Full markers update at init
       updateMarkers();
     })()

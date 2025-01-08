@@ -254,6 +254,12 @@ export class MarkerLayout {
     }
 
     this.sortingOrder = options.sortingOrder === "descending" ? -1 : 1;
+
+    this.map.on("projectiontransition", this.fireMoveEnd);
+  }
+
+  private fireMoveEnd = () => {
+    this.map.fire("moveend");
   }
 
   private computeAnchorOffset(nbFeatures = 1): [number, number] {

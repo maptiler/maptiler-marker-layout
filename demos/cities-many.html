@@ -191,10 +191,7 @@
       map.on("move", softUpdateMarkers);
 
       // Full markers update when the map moving is done
-      map.on("moveend", updateMarkers)
-      
-      // Full markers update when the projection changes (Globe <-> Mercator)
-      map.on("projectiontransition", updateMarkers);
+      map.on("moveend", updateMarkers);
 
       // Full markers update at init
       updateMarkers();
