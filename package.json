@@ -34,7 +34,14 @@
     "build-es": "tsc && vite build -c vite.config-es.ts",
     "dev": "concurrently \"vite -c vite.config-dev.ts\" \"npm run dev-umd\"",
     "dev-umd": "tsc && NODE_ENV=development vite build -w -c vite.config-umd.ts",
-    "ncu": "npx npm-check-updates"
+    "ncu": "npx npm-check-updates",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.ts": [
+      "npm run lint:fix",
+      "npm run format:fix"
+    ]
   },
   "license": "",
   "devDependencies": {
@@ -45,6 +52,8 @@
     "eslint": "^8.57.0",
     "eslint-import-resolver-typescript": "^3.6.1",
     "eslint-plugin-import": "^2.29.1",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.4.3",
     "prettier": "^3.3.1",
     "typescript": "^5.4.5",
     "vite": "^5.2.12",
