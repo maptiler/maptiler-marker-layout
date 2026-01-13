@@ -213,6 +213,19 @@ For detailed guides, API reference, and advanced examples, visit our comprehensi
 
 [API documentation](https://docs.maptiler.com/sdk-js/modules/marker-layout/api/api-reference/)
 
+### Some Concepts
+The Marker Layout...
+- computes screen-space bounding box logic
+- can be provided the desired marker size and relative anchor point
+- is fed with one or multiple vector layer
+- can only use *point* features
+- create non-overlapping bounding boxes
+- can filter and sort features based on vector feature properties
+- sorting can be done with a function, so that rank can come from an external source
+- can group multiple vector features into each marker
+- when updated will retrieve three lists of markers relative to the previous state: the new, the removed and the moved markers
+- does not enforce how the the actual visual markers (eg. divs) should be created, cached, pooled, reused or deleted
+
 ### Options
 
 Here are all the options available:
@@ -383,19 +396,6 @@ This is convenient to use when there are hundreds of vector features found but w
 We can also reset the internal `MarkerStatus` if we need to restart from a blank slate without creating a new `MarkerLayout` instance:
 
 - `.reset()`
-
-### Some Concepts
-The Marker Layout...
-- computes screen-space bounding box logic
-- can be provided the desired marker size and relative anchor point
-- is fed with one or multiple vector layer
-- can only use *point* features
-- create non-overlapping bounding boxes
-- can filter and sort features based on vector feature properties
-- sorting can be done with a function, so that rank can come from an external source
-- can group multiple vector features into each marker
-- when updated will retrieve three lists of markers relative to the previous state: the new, the removed and the moved markers
-- does not enforce how the the actual visual markers (eg. divs) should be created, cached, pooled, reused or deleted
 
 <br>
 
