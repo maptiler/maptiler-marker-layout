@@ -191,6 +191,20 @@ function updateMarkerDiv(abstractMarker, marker) {
 
 Check out the full list of [MapTiler examples](https://docs.maptiler.com/sdk-js/examples/?q=marker+layout)
 
+Here is only a few examples of what's possible with fairly basic HTML markers.
+
+With markers anchored to the city layers, directly fueled by the `streets-v2` style from MapTiler Cloud:
+![](images/cities.png)
+
+Displaying weather data is also a nice usecase. For this, we anchor the markers to cities, towns and villages from an official MapTiler Cloud style and then we asynchronously fetch the weather data using [MapTiler Weather library](https://www.maptiler.com/weather/), for each vector features using their coordinates:
+![](images/weather_europe_large.png)
+![](images/weather_usa_large.png)
+
+**But markers don't need to look like markers!** Smaller markers with transparent background are a nice way to avoid cluter. Icons are SVG animated:
+![](images/weather_minimal.png)
+
+Since markers are overlaying on top of a map, it's generally a good practice to keep them small, so that the basemap remains readable, but **Marker Layout** does not technically enforce that.
+
 <br>
 
 ## 📘 API Reference
@@ -368,7 +382,20 @@ This is convenient to use when there are hundreds of vector features found but w
 
 We can also reset the internal `MarkerStatus` if we need to restart from a blank slate without creating a new `MarkerLayout` instance:
 
-- `.reset()` 
+- `.reset()`
+
+### Some Concepts
+The Marker Layout...
+- computes screen-space bounding box logic
+- can be provided the desired marker size and relative anchor point
+- is fed with one or multiple vector layer
+- can only use *point* features
+- create non-overlapping bounding boxes
+- can filter and sort features based on vector feature properties
+- sorting can be done with a function, so that rank can come from an external source
+- can group multiple vector features into each marker
+- when updated will retrieve three lists of markers relative to the previous state: the new, the removed and the moved markers
+- does not enforce how the the actual visual markers (eg. divs) should be created, cached, pooled, reused or deleted
 
 <br>
 
@@ -407,33 +434,6 @@ This project is licensed under the MapTiler JS Module License – see the [LICE
 This project is built on the shoulders of giants:
 
 - [MapTiler SDK JS](https://www.maptiler.com/interactive-maps/) – The open-source mapping library
-
-Here is only a few examples of what's possible with fairly basic HTML markers.
-
-With markers anchored to the city layers, directly fueled by the `streets-v2` style from MapTiler Cloud:
-![](images/cities.png)
-
-Displaying weather data is also a nice usecase. For this, we anchor the markers to cities, towns and villages from an official MapTiler Cloud style and then we asynchronously fetch the weather data using [MapTiler Weather library](https://www.maptiler.com/weather/), for each vector features using their coordinates:
-![](images/weather_europe_large.png)
-![](images/weather_usa_large.png)
-
-**But markers don't need to look like markers!** Smaller markers with transparent background are a nice way to avoid cluter. Icons are SVG animated:
-![](images/weather_minimal.png)
-
-Since markers are overlaying on top of a map, it's generally a good practice to keep them small, so that the basemap remains readable, but **Marker Layout** does not technically enforce that.
-
-### Some Concepts
-The Marker Layout...
-- computes screen-space bounding box logic
-- can be provided the desired marker size and relative anchor point
-- is fed with one or multiple vector layer
-- can only use *point* features
-- create non-overlapping bounding boxes
-- can filter and sort features based on vector feature properties
-- sorting can be done with a function, so that rank can come from an external source
-- can group multiple vector features into each marker
-- when updated will retrieve three lists of markers relative to the previous state: the new, the removed and the moved markers
-- does not enforce how the the actual visual markers (eg. divs) should be created, cached, pooled, reused or deleted
 
 <br>
 
