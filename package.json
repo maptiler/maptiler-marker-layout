@@ -36,7 +36,7 @@
     "dev-umd": "tsc && NODE_ENV=development vite build -w -c vite.config-umd.ts",
     "ncu": "npx npm-check-updates"
   },
-  "license": "",
+  "license": "See license.md",
   "devDependencies": {
     "@types/node": "^20.14.2",
     "@typescript-eslint/eslint-plugin": "^7.12.0",
