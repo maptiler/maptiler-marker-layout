@@ -133,7 +133,6 @@
         markerAnchor: "top",
         offset: [0, -8], // so that the tip of the marker bottom pin lands on the city dot
         sortingProperty: "rank",
-
         // no filtering so that we get as many features as possible
       });
 
@@ -186,16 +185,18 @@
           const markerDiv = markerLogicContainer[abstractMarker.id];
           updateMarkerDiv(abstractMarker, markerDiv);
         })
-      }
+      };
 
-      // While moving the map, this event is triggered many times per seconds
-      // so we only perform a soft update (that could be debounced)
+      // Soft markers update while moving the map (the event is triggered many times per second, could be debounced)
       map.on("move", softUpdateMarkers);
 
-      // When done moving, we perform a full update
+      // Full markers update when the map moving is done
       map.on("moveend", updateMarkers)
+      
+      // Full markers update when the projection changes (Globe <-> Mercator)
+      map.on("projectiontransition", updateMarkers);
 
-      // Full update at init
+      // Full markers update at init
       updateMarkers();
     })()
 
